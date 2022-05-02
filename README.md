@@ -80,7 +80,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 - [Dan](https://github.com/danhsucowboy) | Front-end | hsu86110@gmail.com
 - [Ting](https://github.com/this-ting) | Front-end | tchangysl@gmail.com
-- [Peter](https://github.com/sc0Vu) | Full-stack alk03073135@gmail.com
+- [Peter](https://github.com/sc0Vu) | Full-stack | alk03073135@gmail.com
 - [Wade](https://github.com/Nasuyue) | Product | wadde.yang@gmail.com
 
 ## Built with
