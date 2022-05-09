@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 import { useWallet } from '@solana/wallet-adapter-react'
 import Image from 'next/image'
@@ -6,6 +6,11 @@ import { Box, Typography, Modal, Tabs, Tab } from '@mui/material'
 import { ChevronLeft, ChevronRight, CreditCard, Repeat } from 'react-feather'
 import boxLogo from '../assets/symbal/box.png'
 import rayLogo from '../assets/symbal/ray.png'
+import useSwr from 'swr'
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
+
+const apiHost = process.env.API_HOST || 'https://api.raydium.io'
 
 const TOKENS = [
   'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/5LSFpvLDkcdV2a3Kiyzmg5YmJsj2XDLySaXvnfP1cgLT/logo.png',
@@ -15,7 +20,11 @@ const TOKENS = [
   'https://sdk.raydium.io/icons/HCgybxq5Upy8Mccihrp7EsmwwFqYZtrHrsmsKwtGXLgW.png',
 ]
 
+const poolId = '4EwbZo8BZXP5313z5A2H11MRBP15M5n6YxfmkjXESKAW'
+const numberOfPeriod = 3 * 365
+
 const Stake: FC = (props) => {
+  const { data, error } = useSwr(`${apiHost}/v2/main/farm/info`, fetcher)
   const testColor = 'bg-[#707070]'
 
   const [tab, setTab] = useState(0)
@@ -25,6 +34,21 @@ const Stake: FC = (props) => {
   }
 
   const wallet = useWallet()
+
+  const [raySingleAPR, setRaySingleAPR] = useState<string>('0.00')
+  const [raySingleAPY, setRaySingleAPY] = useState<string>('0.00')
+
+  useEffect(() => {
+    if (error) {
+      console.error(error)
+    } else if (data && data.official.length > 0 && data.official[0].id === poolId) {
+      const apr = data.official[0].apr.replace('%', '')
+      setRaySingleAPR(apr)
+
+      const apy = ((1 + +apr / (numberOfPeriod * 100)) ** numberOfPeriod - 1) * 100
+      setRaySingleAPY(apy.toFixed(2))
+    }
+  }, [data, error])
 
   return (
     <div className="w-full flex flex-col justify-start items-center">
@@ -40,8 +64,8 @@ const Stake: FC = (props) => {
       <div className="w-1/2 flex justify-between items-center mt-6 gap-4">
         <div className="basis-1/3 h-32 py-5 px-6 bg-white bg-opacity-25 flex flex-col items-start rounded-2xl">
           <Typography variant="subtitle1">Staking APY</Typography>
-          <Typography variant="h4">19.51%</Typography>
-          <Typography variant="subtitle2">Raydium APR: 17.83%</Typography>
+          <Typography variant="h4">{raySingleAPY}%</Typography>
+          <Typography variant="subtitle2">Raydium APR: {raySingleAPR}%</Typography>
         </div>
         <div className="basis-2/3 h-32 py-5 px-6 bg-white bg-opacity-25 rounded-2xl flex">
           <div className="basis-2/3">
